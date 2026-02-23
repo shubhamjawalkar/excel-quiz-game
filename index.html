@@ -1,108 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Excel Quiz Game</title>
+    <title>Excel Mini Simulator</title>
 
     <style>
         body {
             font-family: Arial;
             background: #f4f4f4;
+            text-align: center;
         }
 
-        .quiz-container {
-            max-width: 500px;
-            margin: 50px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        td, th {
+            border: 1px solid #ccc;
+            padding: 8px;
+            width: 80px;
             text-align: center;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
 
         input {
-            padding: 10px;
-            width: 80%;
-            margin: 10px 0;
+            width: 70px;
+            border: none;
+            text-align: center;
+        }
+
+        #formulaInput {
+            width: 300px;
+            padding: 8px;
         }
 
         button {
-            padding: 10px 20px;
-            margin: 5px;
-            cursor: pointer;
-        }
-
-        #feedback {
-            font-weight: bold;
-            margin: 10px 0;
+            padding: 8px 15px;
+            margin: 10px;
         }
     </style>
 </head>
-
 <body>
 
-<div class="quiz-container">
-    <h2>Excel Knowledge Challenge</h2>
+<h2>Excel Mini Simulator</h2>
 
-    <div id="question"></div>
+<p>Task: Use formula to calculate total of A1 + A2 + A3</p>
 
-    <input type="text" id="answerInput" placeholder="Type your answer here">
-    <br>
+<table>
+    <tr>
+        <th></th>
+        <th>A</th>
+    </tr>
+    <tr>
+        <th>1</th>
+        <td><input id="A1" value="10"></td>
+    </tr>
+    <tr>
+        <th>2</th>
+        <td><input id="A2" value="20"></td>
+    </tr>
+    <tr>
+        <th>3</th>
+        <td><input id="A3" value="30"></td>
+    </tr>
+</table>
 
-    <button onclick="submitAnswer()">Submit</button>
-    <button onclick="nextQuestion()">Next</button>
+<p>Enter Formula (Example: =A1+A2+A3)</p>
+<input type="text" id="formulaInput" placeholder="Type formula here">
+<br>
+<button onclick="calculate()">Submit</button>
 
-    <p id="feedback"></p>
-    <h3 id="score"></h3>
-</div>
+<h3 id="result"></h3>
 
 <script>
-    const questions = [
-        {
-            question: "Q1. Format the date 25-09-2020 into YYYY-MM-DD format.",
-            correctAnswer: "2020-09-25"
-        },
-        {
-            question: "Q2. Format the date 01-10-2020 into YYYY-MM-DD format.",
-            correctAnswer: "2020-10-01"
-        }
-    ];
+function calculate() {
+    let formula = document.getElementById("formulaInput").value;
 
-    let current = 0;
-    let score = 0;
-
-    function loadQuestion() {
-        document.getElementById("question").innerText = questions[current].question;
-        document.getElementById("answerInput").value = "";
-        document.getElementById("feedback").innerText = "";
+    if (!formula.startsWith("=")) {
+        document.getElementById("result").innerText = "Formula must start with =";
+        return;
     }
 
-    function submitAnswer() {
-        const userAnswer = document.getElementById("answerInput").value.trim();
-        const correct = questions[current].correctAnswer;
+    formula = formula.substring(1);
 
-        if (userAnswer === correct) {
-            document.getElementById("feedback").innerText = "✅ Correct!";
-            score++;
+    const A1 = parseFloat(document.getElementById("A1").value);
+    const A2 = parseFloat(document.getElementById("A2").value);
+    const A3 = parseFloat(document.getElementById("A3").value);
+
+    try {
+        let computed = eval(formula);
+        let correct = A1 + A2 + A3;
+
+        if (computed === correct) {
+            document.getElementById("result").innerText = "✅ Correct! Result = " + computed;
         } else {
-            document.getElementById("feedback").innerText =
-                "❌ Incorrect! Correct answer is " + correct;
+            document.getElementById("result").innerText = "❌ Incorrect! Your result = " + computed;
         }
+    } catch {
+        document.getElementById("result").innerText = "Invalid formula.";
     }
-
-    function nextQuestion() {
-        current++;
-
-        if (current < questions.length) {
-            loadQuestion();
-        } else {
-            document.getElementById("question").innerText = "Quiz Finished!";
-            document.getElementById("answerInput").style.display = "none";
-            document.getElementById("feedback").innerText = "";
-            document.getElementById("score").innerText = "Your Score: " + score;
-        }
-    }
-
-    loadQuestion();
+}
 </script>
 
 </body>
