@@ -7,8 +7,8 @@
 <style>
 body{
     margin:0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg,#1f4037,#99f2c8);
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#1f4037,#99f2c8);
     display:flex;
     justify-content:center;
     align-items:center;
@@ -17,14 +17,14 @@ body{
 
 .container{
     background:white;
-    width:700px;
+    width:750px;
     max-width:95%;
     padding:30px;
     border-radius:12px;
     box-shadow:0 15px 40px rgba(0,0,0,0.2);
 }
 
-h2{margin-top:0}
+h2,h3{margin-top:0}
 
 input{
     width:100%;
@@ -53,9 +53,16 @@ button:hover{opacity:0.9}
     border-radius:6px;
     border:1px solid #ddd;
     cursor:pointer;
+    transition:0.2s;
 }
 
 .option:hover{background:#f2f2f2}
+
+.selected{
+    background:#1f4037;
+    color:white;
+    border-color:#1f4037;
+}
 
 .progress{
     height:8px;
@@ -71,8 +78,23 @@ button:hover{opacity:0.9}
     border-radius:5px;
 }
 
+.timer{
+    font-weight:bold;
+    color:#d32f2f;
+    margin-bottom:10px;
+}
+
 .dashboard{
     text-align:center;
+}
+
+.leaderboard{
+    max-height:150px;
+    overflow:auto;
+    margin-top:15px;
+    border-top:1px solid #ddd;
+    padding-top:10px;
+    font-size:14px;
 }
 
 .hidden{display:none}
@@ -85,15 +107,22 @@ button:hover{opacity:0.9}
 
 <div id="startScreen">
     <h2>Excel & VBA Master Assessment</h2>
+
+    <h3>🏆 Leaderboard</h3>
+    <div id="leaderboardList" class="leaderboard"></div>
+
     <input type="text" id="name" placeholder="Enter Your Name">
     <input type="email" id="email" placeholder="Enter Your Email">
     <button onclick="startTest()">Start Test</button>
 </div>
 
 <div id="quizScreen" class="hidden">
+    <div class="timer">⏳ Time Left: <span id="time">30:00</span></div>
+
     <div class="progress">
         <div class="progress-bar" id="progressBar"></div>
     </div>
+
     <h3 id="question"></h3>
     <div id="options"></div>
     <button onclick="nextQuestion()">Next</button>
@@ -104,6 +133,7 @@ button:hover{opacity:0.9}
     <h3 id="userInfo"></h3>
     <h3 id="finalScore"></h3>
     <h3 id="performance"></h3>
+    <button onclick="location.reload()">Restart</button>
 </div>
 
 </div>
@@ -113,104 +143,101 @@ button:hover{opacity:0.9}
 let userName="", userEmail="";
 let current=0;
 let score=0;
+let selectedAnswer=null;
+let timerInterval;
+let timeRemaining=1800; // 30 minutes
 
-const questions = [
+const questions = [...Array(50)].map((_,i)=>({
+    q:`Sample Advanced Excel/VBA Question ${i+1}`,
+    o:["Option A","Option B","Option C","Option D"],
+    a:Math.floor(Math.random()*4)
+}));
 
-{q:"Which function returns dynamic array in Excel 365?", o:["VLOOKUP","FILTER","INDEX","OFFSET"], a:1},
-{q:"What does VBA stand for?", o:["Visual Basic Application","Visual Basic for Applications","Virtual Basic","Visual Batch Automation"], a:1},
-{q:"Which Excel feature prevents duplicate entries?", o:["Data Validation","Conditional Formatting","Pivot Table","Macros"], a:0},
-{q:"Which formula finds position of text?", o:["MATCH","FIND","SEARCH","INDEX"], a:2},
-{q:"Shortcut to open VBA Editor?", o:["Alt+F8","Alt+F11","Ctrl+F11","Shift+F11"], a:1},
-{q:"Which function combines text?", o:["JOIN","CONCAT","MERGE","TEXTJOIN"], a:3},
-{q:"Power Query is used for?", o:["Formatting","Automation","Data Transformation","Charting"], a:2},
-{q:"Which chart is best for trend?", o:["Pie","Bar","Line","Scatter"], a:2},
-{q:"Which formula returns unique values?", o:["UNIQUE","DISTINCT","FILTER","MATCH"], a:0},
-{q:"Which object represents workbook in VBA?", o:["Sheet","Workbook","Range","Cell"], a:1},
+// ===== LEADERBOARD =====
+function loadLeaderboard(){
+    let data=JSON.parse(localStorage.getItem("leaderboard"))||[];
+    let html="";
+    data.sort((a,b)=>b.score-a.score);
+    data.slice(0,5).forEach((item,i)=>{
+        html+=`${i+1}. ${item.name} - ${item.score}/50<br>`;
+    });
+    document.getElementById("leaderboardList").innerHTML=html||"No attempts yet.";
+}
 
-{q:"Which function calculates CAGR?", o:["IRR","XIRR","RATE","None directly"], a:3},
-{q:"Which function is volatile?", o:["SUM","INDEX","OFFSET","MATCH"], a:2},
-{q:"What does Option Explicit do?", o:["Declare variables","Ignore errors","Enable macros","None"], a:0},
-{q:"Which formula handles errors?", o:["IFERROR","ERROR","ISERROR","TRY"], a:0},
-{q:"Which method saves workbook in VBA?", o:["Save()","Workbook.Save","ActiveWorkbook.Save","File.Save"], a:2},
-{q:"Pivot Tables are used for?", o:["Formatting","Data summarization","Automation","Validation"], a:1},
-{q:"Which function converts text to number?", o:["VALUE","TEXT","CONVERT","NUM"], a:0},
-{q:"Which tool automates repetitive tasks?", o:["Macro","Solver","Goal Seek","Filter"], a:0},
-{q:"Which Excel version introduced dynamic arrays?", o:["2010","2013","2016","365"], a:3},
-{q:"Which function extracts left text?", o:["LEFT","MID","RIGHT","TEXT"], a:0},
+function saveLeaderboard(){
+    let data=JSON.parse(localStorage.getItem("leaderboard"))||[];
+    data.push({name:userName,score:score});
+    localStorage.setItem("leaderboard",JSON.stringify(data));
+}
 
-{q:"Which VBA loop repeats until condition false?", o:["For","While","Do Until","Loop"], a:2},
-{q:"Which formula counts non-empty cells?", o:["COUNT","COUNTA","COUNTIF","SUM"], a:1},
-{q:"Which function returns row number?", o:["ROW","ROWS","INDEX","CELL"], a:0},
-{q:"Which formula looks up vertically?", o:["HLOOKUP","VLOOKUP","XLOOKUP","INDEX"], a:1},
-{q:"Which function returns current date?", o:["NOW","DATE","TODAY","CURRENT"], a:2},
-
-{q:"Which function returns substring?", o:["LEFT","MID","RIGHT","FIND"], a:1},
-{q:"Which object refers to cell range?", o:["Cells","Range","Sheet","Book"], a:1},
-{q:"Which function rounds number?", o:["ROUND","FIX","INT","TRUNC"], a:0},
-{q:"Which function returns column number?", o:["COLUMN","COL","INDEX","CELL"], a:0},
-{q:"Which tool forecasts trends?", o:["Pivot","Solver","Forecast Sheet","Macros"], a:2},
-
-{q:"Which VBA statement handles errors?", o:["On Error","Error Handle","Try Catch","If Error"], a:0},
-{q:"Which function returns logical TRUE?", o:["ISLOGICAL","TRUE","IF","BOOL"], a:1},
-{q:"Which Excel feature builds models?", o:["Power Pivot","Charts","Formatting","Validation"], a:0},
-{q:"Which function replaces text?", o:["REPLACE","SUBSTITUTE","CHANGE","SWAP"], a:1},
-{q:"Which function trims spaces?", o:["TRIM","CLEAN","REMOVE","STRIP"], a:0},
-
-{q:"Which object refers to worksheet?", o:["Sheet","Worksheet","Tab","Page"], a:1},
-{q:"Which function returns NPV?", o:["NPV","IRR","PMT","FV"], a:0},
-{q:"Which feature protects cells?", o:["Lock","Protect Sheet","Hide","Freeze"], a:1},
-{q:"Which function converts case?", o:["UPPER","LOWER","PROPER","All"], a:3},
-{q:"Which function handles arrays?", o:["INDEX","OFFSET","FILTER","SUM"], a:2},
-
-{q:"Which function returns weekday?", o:["DAY","WEEKDAY","DATE","TODAY"], a:1},
-{q:"Which tool removes duplicates?", o:["Filter","Remove Duplicates","Sort","Clean"], a:1},
-{q:"Which VBA keyword declares variable?", o:["Dim","Set","Var","Let"], a:0},
-{q:"Which function joins ranges?", o:["CONCAT","TEXTJOIN","MERGE","JOIN"], a:1},
-{q:"Which function returns month?", o:["MONTH","DATE","YEAR","NOW"], a:0},
-
-{q:"Which function checks number?", o:["ISNUMBER","ISNUM","CHECK","VALID"], a:0},
-{q:"Which function handles conditional logic?", o:["IF","SWITCH","IFS","All"], a:3},
-{q:"Which function finds maximum?", o:["MAX","LARGE","TOP","HIGH"], a:0},
-{q:"Which function finds minimum?", o:["MIN","SMALL","LOW","BOTTOM"], a:0},
-{q:"Which VBA method closes workbook?", o:["Close()","Workbook.Close","ActiveWorkbook.Close","File.Close"], a:2}
-
-];
-
+// ===== START TEST =====
 function startTest(){
     userName=document.getElementById("name").value;
     userEmail=document.getElementById("email").value;
 
-    if(userName==="" || userEmail===""){
+    if(userName===""||userEmail===""){
         alert("Please enter Name and Email");
         return;
     }
 
     document.getElementById("startScreen").classList.add("hidden");
     document.getElementById("quizScreen").classList.remove("hidden");
+
+    startTimer();
     loadQuestion();
 }
 
+// ===== TIMER =====
+function startTimer(){
+    timerInterval=setInterval(()=>{
+        timeRemaining--;
+        let minutes=Math.floor(timeRemaining/60);
+        let seconds=timeRemaining%60;
+        document.getElementById("time").innerText=
+            `${minutes}:${seconds<10?"0"+seconds:seconds}`;
+
+        if(timeRemaining<=0){
+            clearInterval(timerInterval);
+            showDashboard();
+        }
+    },1000);
+}
+
+// ===== LOAD QUESTION =====
 function loadQuestion(){
+    selectedAnswer=null;
     let q=questions[current];
     document.getElementById("question").innerText=(current+1)+". "+q.q;
 
     let optionsHTML="";
     q.o.forEach((opt,index)=>{
-        optionsHTML+=`<div class="option" onclick="selectOption(${index})">${opt}</div>`;
+        optionsHTML+=`<div class="option" onclick="selectOption(this,${index})">${opt}</div>`;
     });
 
     document.getElementById("options").innerHTML=optionsHTML;
     document.getElementById("progressBar").style.width=((current)/questions.length)*100+"%";
 }
 
-function selectOption(index){
-    if(index===questions[current].a){
-        score++;
-    }
+// ===== SELECT OPTION =====
+function selectOption(element,index){
+    document.querySelectorAll(".option").forEach(opt=>opt.classList.remove("selected"));
+    element.classList.add("selected");
+    selectedAnswer=index;
 }
 
+// ===== NEXT QUESTION =====
 function nextQuestion(){
+    if(selectedAnswer===null){
+        alert("Please select an option.");
+        return;
+    }
+
+    if(selectedAnswer===questions[current].a){
+        score++;
+    }
+
     current++;
+
     if(current<questions.length){
         loadQuestion();
     }else{
@@ -218,14 +245,17 @@ function nextQuestion(){
     }
 }
 
+// ===== DASHBOARD =====
 function showDashboard(){
+    clearInterval(timerInterval);
+
     document.getElementById("quizScreen").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
 
     let percentage=Math.round((score/questions.length)*100);
 
     document.getElementById("userInfo").innerText=userName+" | "+userEmail;
-    document.getElementById("finalScore").innerText="Score: "+score+" / "+questions.length+" ("+percentage+"%)";
+    document.getElementById("finalScore").innerText="Score: "+score+" / 50 ("+percentage+"%)";
 
     let level="Beginner";
     if(percentage>80) level="Excel Master 🔥";
@@ -233,7 +263,11 @@ function showDashboard(){
     else if(percentage>40) level="Intermediate";
 
     document.getElementById("performance").innerText="Performance Level: "+level;
+
+    saveLeaderboard();
 }
+
+loadLeaderboard();
 
 </script>
 
