@@ -80,17 +80,27 @@ button:hover{opacity:0.9}
 
 <div id="startScreen">
 
-<h2>Excel & VBA Master Assessment</h2>
+<h2 style="text-align:center;">Excel & VBA Master Assessment</h2>
 
-<h3>🏆 Leaderboard</h3>
-<div id="leaderboardList" class="leaderboard">Loading...</div>
+<div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:20px;">
 
-<input type="text" id="name" placeholder="Enter Name">
-<input type="email" id="email" placeholder="Enter Email">
-<button onclick="startTest()">Start Test</button>
+    <!-- Leaderboard Card -->
+    <div class="card" style="flex:1;min-width:300px;max-width:420px;">
+        <h3>🏆 Leaderboard</h3>
+        <div id="leaderboardList" class="leaderboard">Loading...</div>
+    </div>
+
+    <!-- Login Card -->
+    <div class="card" style="flex:1;min-width:300px;max-width:420px;">
+        <h3>🎯 Start Test</h3>
+
+        <input type="text" id="name" placeholder="Enter Name">
+        <input type="email" id="email" placeholder="Enter Email">
+        <button onclick="startTest()">Start Test</button>
+    </div>
 
 </div>
-
+</div>
 <div id="quizScreen" class="hidden">
 <div class="timer">⏳ Time Left: <span id="time">30:00</span></div>
 <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
@@ -100,15 +110,32 @@ button:hover{opacity:0.9}
 </div>
 
 <div id="dashboard" class="hidden">
-<h2>Assessment Report</h2>
-<p id="userInfo"></p>
-<p id="finalScore"></p>
-<p id="performance"></p>
-<button onclick="location.reload()">Restart</button>
-</div>
+
+<h2 style="text-align:center;">Assessment Report</h2>
+
+<div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;margin-top:20px;">
+
+    <!-- Score Card -->
+    <div class="card" style="flex:1;min-width:300px;max-width:420px;text-align:center;">
+        <h3>📊 Score Summary</h3>
+        <h1 id="finalScore"></h1>
+        <h2 id="performance"></h2>
+    </div>
+
+    <!-- Details Card -->
+    <div class="card" style="flex:1;min-width:300px;max-width:420px;">
+        <h3>👤 Candidate Details</h3>
+        <p id="userInfo"></p>
+        <p id="timeTaken"></p>
+    </div>
 
 </div>
 
+<div style="text-align:center;margin-top:25px;">
+    <button onclick="location.reload()">Restart</button>
+</div>
+
+</div>
 <script>
 
 const API_URL="https://script.google.com/macros/s/AKfycbx7o7E9f3VPwo-M3T2SkOz05UENmi3WANiAVXunhhBlgTlg2eZ2rKcL3QCyd8M_xmOb/exec";
