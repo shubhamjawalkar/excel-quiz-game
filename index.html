@@ -17,38 +17,37 @@ body{
 }
 .container{
     background:white;
-    width:950px;
+    width:1000px;
     max-width:95%;
-    padding:35px;
+    padding:30px;
     border-radius:18px;
     box-shadow:0 20px 50px rgba(0,0,0,0.25);
 }
 .card{
     background:#f7f9f8;
-    padding:20px;
+    padding:15px;
     border-radius:12px;
-    margin-bottom:20px;
 }
 input{
     width:100%;
-    padding:12px;
-    margin:8px 0;
+    padding:10px;
+    margin:6px 0;
     border-radius:8px;
     border:1px solid #ccc;
 }
 button{
-    padding:12px 20px;
+    padding:10px 18px;
     border:none;
     border-radius:8px;
     cursor:pointer;
     background:#1f4037;
     color:white;
-    margin-top:10px;
+    margin-top:8px;
 }
 button:hover{opacity:0.9}
 .option{
-    padding:12px;
-    margin:8px 0;
+    padding:10px;
+    margin:6px 0;
     border-radius:8px;
     border:1px solid #ddd;
     cursor:pointer;
@@ -62,7 +61,7 @@ button:hover{opacity:0.9}
     height:8px;
     background:#eee;
     border-radius:10px;
-    margin-bottom:15px;
+    margin-bottom:10px;
 }
 .progress-bar{
     height:8px;
@@ -70,24 +69,10 @@ button:hover{opacity:0.9}
     width:0%;
     border-radius:10px;
 }
-.timer{
-    font-weight:bold;
-    color:#d32f2f;
-}
-.leaderboard{
-    max-height:150px;
-    overflow:auto;
-}
-.dashboard-flex{
-    display:flex;
-    gap:30px;
-    flex-wrap:wrap;
-}
-.badge{
-    padding:6px 12px;
-    border-radius:20px;
-    font-weight:bold;
-}
+.timer{color:#d32f2f;font-weight:bold;}
+.leaderboard{max-height:150px;overflow:auto;}
+.dashboard-flex{display:flex;gap:20px;flex-wrap:wrap;}
+.badge{padding:6px 12px;border-radius:20px;font-weight:bold;}
 .pass{background:#d4edda;color:#155724}
 .fail{background:#f8d7da;color:#721c24}
 .hidden{display:none}
@@ -97,31 +82,39 @@ button:hover{opacity:0.9}
 <body>
 <div class="container">
 
-<!-- WELCOME -->
+<!-- ================= WELCOME ================= -->
+
 <div id="startScreen">
 
-    <h2>Excel & VBA Master Assessment</h2>
+<h2 style="text-align:center;">Excel & VBA Master Assessment</h2>
 
-    <div class="card">
+<div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
+
+    <!-- Leaderboard Card -->
+    <div class="card" style="flex:1;min-width:280px;max-width:400px;">
         <h3>🏆 Leaderboard</h3>
         <div id="leaderboardList" class="leaderboard">Loading...</div>
     </div>
 
-    <div class="card">
-        <h3>Start New Test</h3>
+    <!-- Login Card -->
+    <div class="card" style="flex:1;min-width:280px;max-width:400px;">
+        <h3>Start / Resume</h3>
+
         <input type="text" id="name" placeholder="Enter Name">
         <input type="email" id="email" placeholder="Enter Email">
         <button onclick="startNewGame()">Start Test</button>
 
         <hr>
 
-        <h3>Resume Test</h3>
         <input type="text" id="resumeId" placeholder="Enter Unique ID">
         <button onclick="resumeGame()">Resume</button>
     </div>
+
+</div>
 </div>
 
-<!-- QUIZ -->
+<!-- ================= QUIZ ================= -->
+
 <div id="quizScreen" class="hidden">
     <div class="timer">⏳ Time Left: <span id="time">30:00</span></div>
     <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
@@ -130,23 +123,24 @@ button:hover{opacity:0.9}
     <button onclick="nextQuestion()">Next</button>
 </div>
 
-<!-- DASHBOARD -->
+<!-- ================= DASHBOARD ================= -->
+
 <div id="dashboard" class="hidden">
     <h2>Assessment Report</h2>
 
     <div class="dashboard-flex">
-        <div class="card" style="text-align:center;">
-            <h3>Score</h3>
-            <h1 id="percentageText"></h1>
+
+        <div class="card" style="flex:1;text-align:center;">
+            <h3 id="percentageText"></h3>
         </div>
 
-        <div class="card">
+        <div class="card" style="flex:1;">
             <p id="userInfo"></p>
             <p id="finalScore"></p>
             <p id="timeTaken"></p>
-            <p id="performance"></p>
             <div id="passFail"></div>
         </div>
+
     </div>
 
     <button onclick="location.reload()">Restart</button>
@@ -168,54 +162,35 @@ let selectedAnswer=null;
 let timerInterval;
 let timeRemaining=1800;
 
-/* ================= LEVELS ================= */
+/* ================= LEVEL QUESTIONS ================= */
 
-// LEVEL 1 – Basics
 const level1=[
 {q:"Which function returns row number?",o:["ROW","COLUMN","INDEX","CELL"],a:0},
 {q:"Which function counts non-empty cells?",o:["COUNT","COUNTA","COUNTIF","SUM"],a:1},
-{q:"Which function extracts left text?",o:["LEFT","RIGHT","MID","TEXT"],a:0},
-{q:"Which function returns month?",o:["MONTH","DATE","YEAR","NOW"],a:0},
-{q:"Which function returns current date?",o:["NOW","TODAY","DATE","TIME"],a:1}
+{q:"Which function extracts left text?",o:["LEFT","RIGHT","MID","TEXT"],a:0}
 ];
 
-// LEVEL 2 – Intermediate
 const level2=[
 {q:"Which function handles errors?",o:["IFERROR","ERROR","TRY","ISERROR"],a:0},
-{q:"Which function returns maximum?",o:["MAX","TOP","HIGH","LARGE"],a:0},
-{q:"Which function returns minimum?",o:["MIN","LOW","BOTTOM","SMALL"],a:0},
-{q:"Which function replaces text?",o:["REPLACE","SUBSTITUTE","CHANGE","SWAP"],a:1},
-{q:"Which function trims spaces?",o:["TRIM","CLEAN","REMOVE","STRIP"],a:0}
+{q:"Which function returns maximum?",o:["MAX","TOP","HIGH","LARGE"],a:0}
 ];
 
-// LEVEL 3 – Advanced
 const level3=[
 {q:"Which function returns unique values?",o:["UNIQUE","FILTER","MATCH","INDEX"],a:0},
-{q:"Which function joins text with delimiter?",o:["CONCAT","TEXTJOIN","JOIN","MERGE"],a:1},
-{q:"Which function looks up vertically?",o:["HLOOKUP","VLOOKUP","INDEX","MATCH"],a:1},
-{q:"Which Excel version introduced dynamic arrays?",o:["2010","2013","2016","365"],a:3},
-{q:"Which function finds nth largest value?",o:["LARGE","MAX","TOP","HIGH"],a:0}
+{q:"Which function joins text with delimiter?",o:["CONCAT","TEXTJOIN","JOIN","MERGE"],a:1}
 ];
 
-// LEVEL 4 – Power Tools
 const level4=[
 {q:"Which feature summarizes data?",o:["Charts","Pivot Table","Formatting","Validation"],a:1},
-{q:"Which tool removes duplicates?",o:["Filter","Remove Duplicates","Sort","Clean"],a:1},
-{q:"Which feature builds data models?",o:["Power Pivot","Charts","Validation","Filter"],a:0},
-{q:"Which tool forecasts trends?",o:["Pivot","Solver","Forecast Sheet","Macro"],a:2},
-{q:"Which tool automates repetitive tasks?",o:["Macro","Filter","Sort","Validation"],a:0}
+{q:"Which tool forecasts trends?",o:["Pivot","Solver","Forecast Sheet","Macro"],a:2}
 ];
 
-// LEVEL 5 – VBA
 const level5=[
 {q:"What does VBA stand for?",o:["Visual Basic Application","Visual Basic for Applications","Virtual Basic","Visual Batch Automation"],a:1},
 {q:"Shortcut to open VBA Editor?",o:["Alt+F8","Alt+F11","Ctrl+F11","Shift+F11"],a:1},
-{q:"Which keyword declares variable?",o:["Dim","Set","Var","Let"],a:0},
-{q:"Which statement handles errors?",o:["On Error","Error Handle","Try","Catch"],a:0},
-{q:"Which object represents workbook?",o:["Sheet","Workbook","Range","Cell"],a:1}
+{q:"Which keyword declares variable?",o:["Dim","Set","Var","Let"],a:0}
 ];
 
-// Combine levels
 const questions=[...level1,...level2,...level3,...level4,...level5];
 
 /* ================= UNIQUE ID ================= */
@@ -224,7 +199,7 @@ function generateUniqueID(){
     return "PLYR-"+Date.now().toString().slice(-6)+"-"+Math.floor(Math.random()*1000);
 }
 
-/* ================= START ================= */
+/* ================= START GAME ================= */
 
 function startNewGame(){
     userName=document.getElementById("name").value;
@@ -283,10 +258,12 @@ function loadQuestion(){
     selectedAnswer=null;
     let q=questions[current];
     document.getElementById("question").innerText=(current+1)+". "+q.q;
+
     let html="";
     q.o.forEach((opt,i)=>{
         html+=`<div class="option" onclick="selectOption(this,${i})">${opt}</div>`;
     });
+
     document.getElementById("options").innerHTML=html;
     document.getElementById("progressBar").style.width=((current)/questions.length)*100+"%";
 }
@@ -312,10 +289,27 @@ function nextQuestion(){
     else{showDashboard();}
 }
 
+/* ================= SAVE TO GOOGLE SHEET ================= */
+
+async function saveResult(){
+    await fetch(API_URL,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+            name:userName,
+            email:userEmail,
+            score:score,
+            percentage:Math.round((score/questions.length)*100),
+            timeTaken:1800-timeRemaining
+        })
+    });
+}
+
 /* ================= DASHBOARD ================= */
 
-function showDashboard(){
+async function showDashboard(){
     clearInterval(timerInterval);
+
     document.getElementById("quizScreen").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
 
@@ -326,10 +320,12 @@ function showDashboard(){
     document.getElementById("userInfo").innerText=userName+" | "+userEmail;
     document.getElementById("finalScore").innerText="Score: "+score+" / "+questions.length;
     document.getElementById("timeTaken").innerText="Time: "+Math.floor(timeUsed/60)+"m "+(timeUsed%60)+"s";
-    document.getElementById("performance").innerText="Level Completed: 5 Levels";
 
     document.getElementById("passFail").innerHTML=
         percentage>=60?'<span class="badge pass">PASS</span>':'<span class="badge fail">FAIL</span>';
+
+    await saveResult();
+    loadLeaderboard();
 
     localStorage.removeItem("playerData");
 }
