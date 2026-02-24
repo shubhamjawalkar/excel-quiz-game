@@ -23,6 +23,11 @@ body{
     border-radius:18px;
     box-shadow:0 20px 50px rgba(0,0,0,0.25);
 }
+.card{
+    background:#f7f9f8;
+    padding:15px;
+    border-radius:12px;
+}
 input{
     width:100%;
     padding:10px;
@@ -65,7 +70,7 @@ button:hover{opacity:0.9}
     border-radius:10px;
 }
 .timer{color:#d32f2f;font-weight:bold;}
-.leaderboard{max-height:150px;overflow:auto;}
+.leaderboard{max-height:160px;overflow:auto;margin-bottom:15px;}
 .hidden{display:none}
 </style>
 </head>
@@ -74,12 +79,16 @@ button:hover{opacity:0.9}
 <div class="container">
 
 <div id="startScreen">
+
 <h2>Excel & VBA Master Assessment</h2>
+
 <h3>🏆 Leaderboard</h3>
 <div id="leaderboardList" class="leaderboard">Loading...</div>
+
 <input type="text" id="name" placeholder="Enter Name">
 <input type="email" id="email" placeholder="Enter Email">
 <button onclick="startTest()">Start Test</button>
+
 </div>
 
 <div id="quizScreen" class="hidden">
@@ -95,13 +104,14 @@ button:hover{opacity:0.9}
 <p id="userInfo"></p>
 <p id="finalScore"></p>
 <p id="performance"></p>
+<button onclick="location.reload()">Restart</button>
 </div>
 
 </div>
 
 <script>
 
-const API_URL="YOUR_DEPLOYED_WEB_APP_URL_HERE";
+const API_URL="https://script.google.com/macros/s/AKfycbx7o7E9f3VPwo-M3T2SkOz05UENmi3WANiAVXunhhBlgTlg2eZ2rKcL3QCyd8M_xmOb/exec";
 
 let userName="",userEmail="";
 let current=0,score=0;
@@ -109,69 +119,67 @@ let selectedAnswer=null;
 let timerInterval;
 let timeRemaining=1800;
 
-/* ================= 50 ADVANCED QUESTIONS ================= */
+/* ================= 50 QUESTIONS ================= */
 
 const questions=[
 
-/* LEVEL 1 – Core Functions */
-{q:"Which function returns row number of a cell?",o:["ROW","COLUMN","INDEX","CELL"],a:0},
+/* Core (10) */
+{q:"Which function returns row number?",o:["ROW","COLUMN","INDEX","CELL"],a:0},
 {q:"Which function counts non-empty cells?",o:["COUNT","COUNTA","COUNTIF","SUM"],a:1},
 {q:"Which function extracts left text?",o:["LEFT","RIGHT","MID","TEXT"],a:0},
-{q:"Which function returns current date only?",o:["NOW","DATE","TODAY","TIME"],a:2},
 {q:"Which function returns column number?",o:["COLUMN","COL","INDEX","CELL"],a:0},
-{q:"Which function rounds to nearest integer?",o:["ROUND","INT","TRUNC","FIX"],a:0},
-{q:"Which function checks if value is number?",o:["ISNUMBER","ISNUM","CHECK","TYPE"],a:0},
-{q:"Which function returns position of value?",o:["MATCH","INDEX","LOOKUP","SEARCH"],a:0},
-{q:"Which function concatenates text?",o:["MERGE","JOIN","CONCAT","TEXTJOIN"],a:3},
+{q:"Which function returns current date?",o:["NOW","DATE","TODAY","TIME"],a:2},
+{q:"Which function rounds number?",o:["ROUND","INT","TRUNC","FIX"],a:0},
+{q:"Which function checks if number?",o:["ISNUMBER","ISNUM","CHECK","TYPE"],a:0},
+{q:"Which function finds position?",o:["MATCH","INDEX","LOOKUP","SEARCH"],a:0},
 {q:"Which function handles errors?",o:["IFERROR","ERROR","TRY","CATCH"],a:0},
+{q:"Which function trims spaces?",o:["CLEAN","TRIM","REMOVE","STRIP"],a:1},
 
-/* LEVEL 2 – Lookup & Arrays */
+/* Lookup & Arrays (10) */
 {q:"Which function returns unique values?",o:["UNIQUE","FILTER","MATCH","INDEX"],a:0},
-{q:"Which function filters data by criteria?",o:["FILTER","SORT","LOOKUP","MATCH"],a:0},
-{q:"Which function sorts array?",o:["ORDER","RANK","SORT","ARRANGE"],a:2},
-{q:"Which function looks up vertically?",o:["HLOOKUP","VLOOKUP","LOOKUP","XLOOKUP"],a:1},
-{q:"Which function replaces VLOOKUP in 365?",o:["INDEX","MATCH","XLOOKUP","LOOKUP"],a:2},
-{q:"Which function returns nth largest value?",o:["MAX","TOP","LARGE","HIGH"],a:2},
-{q:"Which function joins range with delimiter?",o:["JOIN","TEXTJOIN","CONCAT","MERGE"],a:1},
-{q:"Which function spills dynamic array?",o:["UNIQUE","OFFSET","INDIRECT","CELL"],a:0},
-{q:"Which function returns multiple matches?",o:["MATCH","FILTER","LOOKUP","INDEX"],a:1},
-{q:"Which function converts text to number?",o:["VALUE","NUM","TEXT","CONVERT"],a:0},
+{q:"Which function filters by criteria?",o:["FILTER","SORT","MATCH","LOOKUP"],a:0},
+{q:"Which function sorts array?",o:["ORDER","SORT","RANK","ARRANGE"],a:1},
+{q:"Which replaces VLOOKUP?",o:["INDEX","MATCH","XLOOKUP","LOOKUP"],a:2},
+{q:"Which finds nth largest?",o:["MAX","TOP","LARGE","HIGH"],a:2},
+{q:"Which joins with delimiter?",o:["JOIN","TEXTJOIN","CONCAT","MERGE"],a:1},
+{q:"Which spills dynamic array?",o:["UNIQUE","OFFSET","INDIRECT","CELL"],a:0},
+{q:"Which returns multiple matches?",o:["MATCH","FILTER","LOOKUP","INDEX"],a:1},
+{q:"Which converts text to number?",o:["VALUE","NUM","TEXT","CONVERT"],a:0},
+{q:"Which function returns month?",o:["MONTH","DATE","YEAR","NOW"],a:0},
 
-/* LEVEL 3 – Advanced Excel */
-{q:"Which feature summarizes large datasets?",o:["Pivot Table","Charts","Filter","Validation"],a:0},
-{q:"Which feature builds relationships between tables?",o:["Power Query","Power Pivot","Pivot Table","Solver"],a:1},
-{q:"Which tool removes duplicates?",o:["Filter","Sort","Remove Duplicates","Clean"],a:2},
-{q:"Which function returns weekday?",o:["DAY","WEEKDAY","DATE","NOW"],a:1},
-{q:"Which function handles multiple IF conditions?",o:["IF","IFS","SWITCH","All"],a:3},
+/* Advanced Excel (10) */
+{q:"Which summarizes data?",o:["Charts","Pivot Table","Filter","Validation"],a:1},
+{q:"Which builds relationships?",o:["Power Query","Power Pivot","Solver","Pivot"],a:1},
+{q:"Which removes duplicates?",o:["Filter","Remove Duplicates","Sort","Clean"],a:1},
+{q:"Which forecasts trends?",o:["Solver","Forecast Sheet","Pivot","Macro"],a:1},
+{q:"Which calculates NPV?",o:["NPV","IRR","PMT","FV"],a:0},
+{q:"Which calculates IRR?",o:["NPV","IRR","RATE","FV"],a:1},
 {q:"Which function is volatile?",o:["SUM","OFFSET","INDEX","MATCH"],a:1},
-{q:"Which tool forecasts trends?",o:["Solver","Forecast Sheet","Pivot","Macro"],a:1},
-{q:"Which function calculates NPV?",o:["NPV","IRR","PMT","FV"],a:0},
-{q:"Which function calculates IRR?",o:["NPV","IRR","RATE","FV"],a:1},
-{q:"Which function trims extra spaces?",o:["CLEAN","TRIM","REMOVE","STRIP"],a:1},
+{q:"Which handles multiple conditions?",o:["IF","IFS","SWITCH","All"],a:3},
+{q:"Which returns weekday?",o:["DAY","WEEKDAY","DATE","NOW"],a:1},
+{q:"Which introduced dynamic arrays?",o:["2010","2013","2016","365"],a:3},
 
-/* LEVEL 4 – Data & Modeling */
-{q:"Which Excel version introduced dynamic arrays?",o:["2010","2013","2016","365"],a:3},
-{q:"Which function returns substring position?",o:["FIND","SEARCH","MATCH","INDEX"],a:1},
-{q:"Which function calculates CAGR directly?",o:["RATE","IRR","XIRR","None"],a:3},
-{q:"Which function calculates loan payment?",o:["NPV","PMT","FV","IRR"],a:1},
-{q:"Which object refers to cell range in VBA?",o:["Cells","Range","Sheet","Book"],a:1},
-{q:"Which feature protects worksheet?",o:["Lock","Protect Sheet","Hide","Freeze"],a:1},
-{q:"Which function extracts right text?",o:["LEFT","RIGHT","MID","TEXT"],a:1},
-{q:"Which function returns month number?",o:["MONTH","DATE","YEAR","NOW"],a:0},
-{q:"Which function calculates average?",o:["AVG","AVERAGE","MEAN","MID"],a:1},
-{q:"Which tool records automation steps?",o:["Macro Recorder","Solver","Pivot","Forecast"],a:0},
-
-/* LEVEL 5 – VBA (Advanced) */
+/* VBA (20) */
 {q:"What does VBA stand for?",o:["Visual Basic Application","Visual Basic for Applications","Virtual Basic","Visual Batch Automation"],a:1},
 {q:"Shortcut to open VBA editor?",o:["Alt+F8","Alt+F11","Ctrl+F11","Shift+F11"],a:1},
-{q:"Which keyword declares variable?",o:["Dim","Set","Var","Let"],a:0},
-{q:"Which statement handles errors?",o:["On Error","Try","Catch","Handle"],a:0},
-{q:"Which loop repeats until condition false?",o:["For","While","Do Until","Loop"],a:2},
+{q:"Which declares variable?",o:["Dim","Set","Var","Let"],a:0},
+{q:"Which handles errors?",o:["On Error","Try","Catch","Handle"],a:0},
+{q:"Which loop repeats until false?",o:["For","While","Do Until","Loop"],a:2},
 {q:"Which object represents workbook?",o:["Sheet","Workbook","Range","Cell"],a:1},
 {q:"Which method saves workbook?",o:["Save()","Workbook.Save","ActiveWorkbook.Save","File.Save"],a:2},
-{q:"Which VBA keyword assigns object?",o:["Dim","Set","Let","Var"],a:1},
-{q:"Which event runs when workbook opens?",o:["Workbook_Start","Workbook_Open","AutoRun","OpenEvent"],a:1},
-{q:"Which VBA method closes workbook?",o:["Close()","Workbook.Close","ActiveWorkbook.Close","File.Close"],a:2}
+{q:"Which assigns object?",o:["Dim","Set","Let","Var"],a:1},
+{q:"Which runs on workbook open?",o:["Workbook_Start","Workbook_Open","AutoRun","OpenEvent"],a:1},
+{q:"Which closes workbook?",o:["Close()","Workbook.Close","ActiveWorkbook.Close","File.Close"],a:2},
+{q:"Which loop repeats fixed times?",o:["For","While","Do","Until"],a:0},
+{q:"Which object refers to range?",o:["Cells","Range","Sheet","Book"],a:1},
+{q:"Which statement exits loop?",o:["Break","Exit For","Stop","Return"],a:1},
+{q:"Which keyword assigns value?",o:["Set","Let","Dim","Const"],a:1},
+{q:"Which keyword defines constant?",o:["Dim","Set","Const","Static"],a:2},
+{q:"Which event runs before close?",o:["Workbook_Close","Workbook_End","CloseEvent","Stop"],a:0},
+{q:"Which creates message box?",o:["MsgBox","Alert","Message","Show"],a:0},
+{q:"Which gets active sheet?",o:["ActiveSheet","CurrentSheet","SheetActive","ThisSheet"],a:0},
+{q:"Which declares public variable?",o:["Public","Dim","Set","Global"],a:0},
+{q:"Which references this workbook?",o:["ActiveWorkbook","ThisWorkbook","Workbook","CurrentWorkbook"],a:1}
 
 ];
 
@@ -187,7 +195,7 @@ if(timeRemaining<=0){clearInterval(timerInterval);showDashboard();}
 },1000);
 }
 
-/* ================= QUIZ LOGIC ================= */
+/* ================= QUIZ ================= */
 
 function startTest(){
 userName=document.getElementById("name").value;
@@ -228,7 +236,7 @@ if(current<questions.length){loadQuestion();}
 else{showDashboard();}
 }
 
-/* ================= SAVE RESULT ================= */
+/* ================= SAVE ================= */
 
 async function saveResult(){
 await fetch(API_URL,{
@@ -267,12 +275,10 @@ async function loadLeaderboard(){
 try{
 const res=await fetch(API_URL);
 const data=await res.json();
-
 let html="";
 data.forEach((row,index)=>{
 html+=`<div>${index+1}. <strong>${row.name}</strong> - ${row.score}</div>`;
 });
-
 document.getElementById("leaderboardList").innerHTML=html||"No attempts yet.";
 }catch{
 document.getElementById("leaderboardList").innerHTML="Unable to load leaderboard.";
