@@ -90,13 +90,13 @@ button:hover{opacity:0.9}
 
 <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;">
 
-    <!-- Leaderboard Card -->
+    <!-- Leaderboard -->
     <div class="card" style="flex:1;min-width:280px;max-width:400px;">
         <h3>🏆 Leaderboard</h3>
         <div id="leaderboardList" class="leaderboard">Loading...</div>
     </div>
 
-    <!-- Login Card -->
+    <!-- Login -->
     <div class="card" style="flex:1;min-width:280px;max-width:400px;">
         <h3>Start / Resume</h3>
 
@@ -129,7 +129,6 @@ button:hover{opacity:0.9}
     <h2>Assessment Report</h2>
 
     <div class="dashboard-flex">
-
         <div class="card" style="flex:1;text-align:center;">
             <h3 id="percentageText"></h3>
         </div>
@@ -140,7 +139,6 @@ button:hover{opacity:0.9}
             <p id="timeTaken"></p>
             <div id="passFail"></div>
         </div>
-
     </div>
 
     <button onclick="location.reload()">Restart</button>
@@ -162,33 +160,38 @@ let selectedAnswer=null;
 let timerInterval;
 let timeRemaining=1800;
 
-/* ================= LEVEL QUESTIONS ================= */
+/* ================= QUESTIONS (5 LEVELS) ================= */
 
 const level1=[
 {q:"Which function returns row number?",o:["ROW","COLUMN","INDEX","CELL"],a:0},
 {q:"Which function counts non-empty cells?",o:["COUNT","COUNTA","COUNTIF","SUM"],a:1},
-{q:"Which function extracts left text?",o:["LEFT","RIGHT","MID","TEXT"],a:0}
+{q:"Which function extracts left text?",o:["LEFT","RIGHT","MID","TEXT"],a:0},
+{q:"Which function returns month?",o:["MONTH","DATE","YEAR","NOW"],a:0}
 ];
 
 const level2=[
 {q:"Which function handles errors?",o:["IFERROR","ERROR","TRY","ISERROR"],a:0},
-{q:"Which function returns maximum?",o:["MAX","TOP","HIGH","LARGE"],a:0}
+{q:"Which function returns maximum?",o:["MAX","TOP","HIGH","LARGE"],a:0},
+{q:"Which function returns minimum?",o:["MIN","LOW","BOTTOM","SMALL"],a:0}
 ];
 
 const level3=[
 {q:"Which function returns unique values?",o:["UNIQUE","FILTER","MATCH","INDEX"],a:0},
-{q:"Which function joins text with delimiter?",o:["CONCAT","TEXTJOIN","JOIN","MERGE"],a:1}
+{q:"Which function joins text with delimiter?",o:["CONCAT","TEXTJOIN","JOIN","MERGE"],a:1},
+{q:"Which function looks up vertically?",o:["HLOOKUP","VLOOKUP","INDEX","MATCH"],a:1}
 ];
 
 const level4=[
 {q:"Which feature summarizes data?",o:["Charts","Pivot Table","Formatting","Validation"],a:1},
-{q:"Which tool forecasts trends?",o:["Pivot","Solver","Forecast Sheet","Macro"],a:2}
+{q:"Which tool forecasts trends?",o:["Pivot","Solver","Forecast Sheet","Macro"],a:2},
+{q:"Which tool automates repetitive tasks?",o:["Macro","Filter","Sort","Validation"],a:0}
 ];
 
-const level5=[
+const level5=[  // VBA LAST
 {q:"What does VBA stand for?",o:["Visual Basic Application","Visual Basic for Applications","Virtual Basic","Visual Batch Automation"],a:1},
 {q:"Shortcut to open VBA Editor?",o:["Alt+F8","Alt+F11","Ctrl+F11","Shift+F11"],a:1},
-{q:"Which keyword declares variable?",o:["Dim","Set","Var","Let"],a:0}
+{q:"Which keyword declares variable?",o:["Dim","Set","Var","Let"],a:0},
+{q:"Which statement handles errors?",o:["On Error","Error Handle","Try","Catch"],a:0}
 ];
 
 const questions=[...level1,...level2,...level3,...level4,...level5];
@@ -213,7 +216,6 @@ function startNewGame(){
     }));
 
     alert("Your Unique ID: "+id);
-
     startGameEngine();
 }
 
@@ -278,12 +280,6 @@ function nextQuestion(){
     if(selectedAnswer===null){alert("Select option");return;}
     if(selectedAnswer===questions[current].a){score++;}
 
-    localStorage.setItem("playerData",JSON.stringify({
-        id:JSON.parse(localStorage.getItem("playerData")).id,
-        name:userName,email:userEmail,
-        current:current+1,score:score,timeRemaining:timeRemaining
-    }));
-
     current++;
     if(current<questions.length){loadQuestion();}
     else{showDashboard();}
@@ -294,6 +290,7 @@ function nextQuestion(){
 async function saveResult(){
     await fetch(API_URL,{
         method:"POST",
+        mode:"no-cors",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
             name:userName,
@@ -325,42 +322,8 @@ async function showDashboard(){
         percentage>=60?'<span class="badge pass">PASS</span>':'<span class="badge fail">FAIL</span>';
 
     await saveResult();
-    loadLeaderboard();
-
     localStorage.removeItem("playerData");
 }
-
-/* ================= OPTIMIZED LEADERBOARD ================= */
-
-async function loadLeaderboard(){
-    const cache=localStorage.getItem("leaderboard_cache");
-    const cacheTime=localStorage.getItem("leaderboard_cache_time");
-
-    if(cache && cacheTime && (Date.now()-cacheTime<300000)){
-        document.getElementById("leaderboardList").innerHTML=cache;
-        return;
-    }
-
-    try{
-        const res=await fetch(API_URL);
-        const data=await res.json();
-        const filtered=data.filter(r=>r[1]&&r[3]).sort((a,b)=>b[3]-a[3]).slice(0,5);
-
-        let html="";
-        filtered.forEach((row,i)=>{
-            html+=`<div>${i+1}. ${row[1]} - ${row[3]}</div>`;
-        });
-
-        document.getElementById("leaderboardList").innerHTML=html||"No attempts yet.";
-        localStorage.setItem("leaderboard_cache",html);
-        localStorage.setItem("leaderboard_cache_time",Date.now());
-
-    }catch{
-        document.getElementById("leaderboardList").innerHTML="Unable to load leaderboard.";
-    }
-}
-
-loadLeaderboard();
 
 </script>
 </body>
