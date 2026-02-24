@@ -103,15 +103,47 @@ button{
 </div>
 
 <div id="dashboard" class="hidden">
-    <h2>Assessment Completed</h2>
-    <h3 id="userInfo"></h3>
-    <h3 id="finalScore"></h3>
-    <h3 id="performance"></h3>
-    <button onclick="location.reload()">Restart</button>
-</div>
+    <h2>🎉 Assessment Completed</h2>
 
-</div>
+    <div style="display:flex; justify-content:space-between; margin-top:20px; gap:20px; flex-wrap:wrap;">
 
+        <!-- Score Card -->
+        <div style="flex:1; min-width:250px; background:#f4f7f6; padding:20px; border-radius:10px;">
+            <h3>📊 Score Overview</h3>
+            <div id="circleContainer" style="position:relative; width:150px; height:150px; margin:auto;">
+                <svg width="150" height="150">
+                    <circle cx="75" cy="75" r="65" stroke="#eee" stroke-width="12" fill="none"/>
+                    <circle id="progressCircle" cx="75" cy="75" r="65"
+                        stroke="#1f4037"
+                        stroke-width="12"
+                        fill="none"
+                        stroke-dasharray="408"
+                        stroke-dashoffset="408"
+                        stroke-linecap="round"
+                        transform="rotate(-90 75 75)"/>
+                </svg>
+                <div id="percentageText"
+                     style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+                     font-size:22px; font-weight:bold;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Card -->
+        <div style="flex:1; min-width:250px; background:#f4f7f6; padding:20px; border-radius:10px;">
+            <h3>👤 Candidate Details</h3>
+            <p id="userInfo"></p>
+            <p id="finalScore"></p>
+            <p id="timeTaken"></p>
+            <p id="performance" style="font-weight:bold;"></p>
+            <p id="passFail" style="font-size:18px;"></p>
+        </div>
+    </div>
+
+    <div style="margin-top:25px;">
+        <button onclick="location.reload()">🔁 Restart Test</button>
+    </div>
+</div>
 <script>
 
 const API_URL="https://script.google.com/macros/s/AKfycbw_XB3KTyGXz-etw84Ttrvg1BWmzxH16fAM4MWOAMpY9qH4UqIqkDY9dQNpTUZdZNiu/exec";
