@@ -5,6 +5,8 @@
 <title>Excel & VBA Master Assessment</title>
 
 <style>
+*{box-sizing:border-box}
+
 body{
     margin:0;
     font-family:'Segoe UI',sans-serif;
@@ -14,68 +16,100 @@ body{
     align-items:center;
     height:100vh;
 }
+
 .container{
-    background:white;
-    width:750px;
+    background:rgba(255,255,255,0.95);
+    width:900px;
     max-width:95%;
-    padding:30px;
-    border-radius:12px;
-    box-shadow:0 15px 40px rgba(0,0,0,0.2);
+    padding:40px;
+    border-radius:18px;
+    box-shadow:0 20px 50px rgba(0,0,0,0.25);
 }
+
 input{
     width:100%;
-    padding:12px;
+    padding:14px;
     margin:10px 0;
-    border-radius:6px;
+    border-radius:8px;
     border:1px solid #ccc;
 }
+
 button{
-    padding:12px 20px;
+    padding:14px 25px;
     border:none;
-    border-radius:6px;
+    border-radius:8px;
     cursor:pointer;
-    background:#1f4037;
+    background:linear-gradient(90deg,#1f4037,#2c7a65);
     color:white;
-    margin-top:10px;
+    transition:0.3s;
 }
+button:hover{transform:scale(1.05);}
+
 .option{
-    display:block;
-    padding:10px;
-    margin:8px 0;
-    border-radius:6px;
+    padding:12px;
+    margin:10px 0;
+    border-radius:8px;
     border:1px solid #ddd;
     cursor:pointer;
 }
-.option:hover{background:#f2f2f2}
+.option:hover{background:#f1f1f1}
 .selected{
     background:#1f4037;
     color:white;
 }
+
 .progress{
     height:8px;
     background:#eee;
-    border-radius:5px;
-    margin-bottom:15px;
+    border-radius:10px;
+    margin-bottom:20px;
 }
 .progress-bar{
     height:8px;
     background:#1f4037;
     width:0%;
-    border-radius:5px;
+    border-radius:10px;
 }
+
 .timer{
     font-weight:bold;
     color:#d32f2f;
     margin-bottom:10px;
 }
+
 .leaderboard{
+    background:#f7f9f8;
+    padding:15px;
+    border-radius:10px;
     max-height:150px;
     overflow:auto;
-    margin-top:15px;
-    border-top:1px solid #ddd;
-    padding-top:10px;
     font-size:14px;
 }
+
+.dashboard-flex{
+    display:flex;
+    gap:30px;
+    flex-wrap:wrap;
+    margin-top:25px;
+}
+
+.card{
+    flex:1;
+    min-width:280px;
+    background:#f7f9f8;
+    padding:25px;
+    border-radius:15px;
+}
+
+.badge{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:bold;
+}
+.pass{background:#d4edda;color:#155724}
+.fail{background:#f8d7da;color:#721c24}
+
 .hidden{display:none}
 </style>
 </head>
@@ -87,6 +121,7 @@ button{
     <h2>Excel & VBA Master Assessment</h2>
     <h3>🏆 Global Leaderboard</h3>
     <div id="leaderboardList" class="leaderboard">Loading...</div>
+
     <input type="text" id="name" placeholder="Enter Your Name">
     <input type="email" id="email" placeholder="Enter Your Email">
     <button onclick="startTest()">Start Test</button>
@@ -94,64 +129,66 @@ button{
 
 <div id="quizScreen" class="hidden">
     <div class="timer">⏳ Time Left: <span id="time">30:00</span></div>
-    <div class="progress">
-        <div class="progress-bar" id="progressBar"></div>
-    </div>
+    <div class="progress"><div class="progress-bar" id="progressBar"></div></div>
     <h3 id="question"></h3>
     <div id="options"></div>
     <button onclick="nextQuestion()">Next</button>
 </div>
 
 <div id="dashboard" class="hidden">
-    <h2>🎉 Assessment Completed</h2>
+    <h2>🎉 Assessment Report</h2>
 
-    <div style="display:flex; justify-content:space-between; margin-top:20px; gap:20px; flex-wrap:wrap;">
+    <div class="dashboard-flex">
 
-        <!-- Score Card -->
-        <div style="flex:1; min-width:250px; background:#f4f7f6; padding:20px; border-radius:10px;">
-            <h3>📊 Score Overview</h3>
-            <div id="circleContainer" style="position:relative; width:150px; height:150px; margin:auto;">
-                <svg width="150" height="150">
-                    <circle cx="75" cy="75" r="65" stroke="#eee" stroke-width="12" fill="none"/>
-                    <circle id="progressCircle" cx="75" cy="75" r="65"
+        <div class="card" style="text-align:center;">
+            <h3>Overall Score</h3>
+            <div style="position:relative; width:170px; height:170px; margin:auto;">
+                <svg width="170" height="170">
+                    <circle cx="85" cy="85" r="75" stroke="#eee" stroke-width="15" fill="none"/>
+                    <circle id="progressCircle"
+                        cx="85" cy="85" r="75"
                         stroke="#1f4037"
-                        stroke-width="12"
+                        stroke-width="15"
                         fill="none"
-                        stroke-dasharray="408"
-                        stroke-dashoffset="408"
+                        stroke-dasharray="471"
+                        stroke-dashoffset="471"
                         stroke-linecap="round"
-                        transform="rotate(-90 75 75)"/>
+                        transform="rotate(-90 85 85)"/>
                 </svg>
                 <div id="percentageText"
-                     style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-                     font-size:22px; font-weight:bold;">
+                     style="position:absolute; top:50%; left:50%;
+                     transform:translate(-50%,-50%);
+                     font-size:26px; font-weight:bold;">
                 </div>
             </div>
         </div>
 
-        <!-- Details Card -->
-        <div style="flex:1; min-width:250px; background:#f4f7f6; padding:20px; border-radius:10px;">
-            <h3>👤 Candidate Details</h3>
+        <div class="card">
+            <h3>Candidate Details</h3>
             <p id="userInfo"></p>
             <p id="finalScore"></p>
             <p id="timeTaken"></p>
-            <p id="performance" style="font-weight:bold;"></p>
-            <p id="passFail" style="font-size:18px;"></p>
+            <p id="performance"></p>
+            <div id="passFail"></div>
         </div>
     </div>
 
-    <div style="margin-top:25px;">
-        <button onclick="location.reload()">🔁 Restart Test</button>
+    <div style="margin-top:30px;">
+        <button onclick="location.reload()">Restart</button>
     </div>
 </div>
-<script>
 
+</div>
+
+<script>
 const API_URL="https://script.google.com/macros/s/AKfycbw_XB3KTyGXz-etw84Ttrvg1BWmzxH16fAM4MWOAMpY9qH4UqIqkDY9dQNpTUZdZNiu/exec";
 
 let userName="",userEmail="";
 let current=0,score=0,selectedAnswer=null;
 let timerInterval;
 let timeRemaining=1800;
+
+/* ===================== 50 QUESTIONS ===================== */
 
 const questions=[
 {q:"Which function returns dynamic array in Excel 365?",o:["VLOOKUP","FILTER","INDEX","OFFSET"],a:1},
@@ -210,40 +247,12 @@ const questions=[
 {q:"Which function finds largest nth value?",o:["LARGE","MAX","TOP","HIGH"],a:0}
 ];
 
-async function loadLeaderboard(){
-    try{
-        const res=await fetch(API_URL);
-        const data=await res.json();
-        const filtered=data.filter(r=>r[1]&&r[3]);
-        filtered.sort((a,b)=>b[3]-a[3]);
-        let html="";
-        filtered.slice(0,10).forEach((row,i)=>{
-            html+=`${i+1}. ${row[1]} - ${row[3]}/50<br>`;
-        });
-        document.getElementById("leaderboardList").innerHTML=html||"No attempts yet.";
-    }catch{
-        document.getElementById("leaderboardList").innerHTML="Error loading leaderboard.";
-    }
-}
-
-async function saveResult(){
-    await fetch(API_URL,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-            name:userName,
-            email:userEmail,
-            score:score,
-            percentage:Math.round((score/50)*100),
-            timeTaken:1800-timeRemaining
-        })
-    });
-}
+/* ======================================================= */
 
 function startTest(){
     userName=document.getElementById("name").value;
     userEmail=document.getElementById("email").value;
-    if(!userName||!userEmail){alert("Please enter Name and Email");return;}
+    if(!userName||!userEmail){alert("Enter Name & Email");return;}
     document.getElementById("startScreen").classList.add("hidden");
     document.getElementById("quizScreen").classList.remove("hidden");
     startTimer();
@@ -279,51 +288,43 @@ function selectOption(el,i){
 }
 
 function nextQuestion(){
-    if(selectedAnswer===null){alert("Please select an option.");return;}
+    if(selectedAnswer===null){alert("Select an option");return;}
     if(selectedAnswer===questions[current].a){score++;}
     current++;
-    if(current<questions.length){loadQuestion();}else{showDashboard();}
+    if(current<questions.length){loadQuestion();}
+    else{showDashboard();}
 }
 
-async function showDashboard(){
+function showDashboard(){
     clearInterval(timerInterval);
-
     document.getElementById("quizScreen").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
 
-    let percentage = Math.round((score/50)*100);
-    let timeUsed = 1800 - timeRemaining;
+    let percentage=Math.round((score/50)*100);
+    let timeUsed=1800-timeRemaining;
 
-    document.getElementById("userInfo").innerText = userName + " | " + userEmail;
-    document.getElementById("finalScore").innerText = "Score: " + score + " / 50";
-    document.getElementById("timeTaken").innerText = "⏱ Time Taken: " + Math.floor(timeUsed/60) + " min " + (timeUsed%60) + " sec";
+    document.getElementById("userInfo").innerText=userName+" | "+userEmail;
+    document.getElementById("finalScore").innerText="Score: "+score+" / 50";
+    document.getElementById("timeTaken").innerText="Time: "+Math.floor(timeUsed/60)+"m "+(timeUsed%60)+"s";
 
     let level="Beginner";
     if(percentage>80) level="Excel Master 🔥";
     else if(percentage>60) level="Advanced";
     else if(percentage>40) level="Intermediate";
+    document.getElementById("performance").innerText="Level: "+level;
 
-    document.getElementById("performance").innerText = "Level: " + level;
+    let badge=document.getElementById("passFail");
+    badge.innerHTML=percentage>=60?
+        '<span class="badge pass">PASS</span>':
+        '<span class="badge fail">FAIL</span>';
 
-    if(percentage>=60){
-        document.getElementById("passFail").innerHTML="✅ PASS";
-        document.getElementById("passFail").style.color="green";
-    }else{
-        document.getElementById("passFail").innerHTML="❌ FAIL";
-        document.getElementById("passFail").style.color="red";
-    }
+    const circle=document.getElementById("progressCircle");
+    const radius=75;
+    const circumference=2*Math.PI*radius;
+    const offset=circumference-(percentage/100)*circumference;
+    circle.style.strokeDashoffset=offset;
 
-    // Animate Circle
-    const circle = document.getElementById("progressCircle");
-    const radius = 65;
-    const circumference = 2 * Math.PI * radius;
-    const offset = circumference - (percentage / 100) * circumference;
-    circle.style.strokeDashoffset = offset;
-
-    document.getElementById("percentageText").innerText = percentage + "%";
-
-    await saveResult();
-    loadLeaderboard();
+    document.getElementById("percentageText").innerText=percentage+"%";
 }
 </script>
 </body>
