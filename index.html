@@ -287,22 +287,44 @@ function nextQuestion(){
 
 async function showDashboard(){
     clearInterval(timerInterval);
+
     document.getElementById("quizScreen").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
-    let percentage=Math.round((score/50)*100);
-    document.getElementById("userInfo").innerText=userName+" | "+userEmail;
-    document.getElementById("finalScore").innerText="Score: "+score+" / 50 ("+percentage+"%)";
+
+    let percentage = Math.round((score/50)*100);
+    let timeUsed = 1800 - timeRemaining;
+
+    document.getElementById("userInfo").innerText = userName + " | " + userEmail;
+    document.getElementById("finalScore").innerText = "Score: " + score + " / 50";
+    document.getElementById("timeTaken").innerText = "⏱ Time Taken: " + Math.floor(timeUsed/60) + " min " + (timeUsed%60) + " sec";
+
     let level="Beginner";
     if(percentage>80) level="Excel Master 🔥";
     else if(percentage>60) level="Advanced";
     else if(percentage>40) level="Intermediate";
-    document.getElementById("performance").innerText="Performance Level: "+level;
+
+    document.getElementById("performance").innerText = "Level: " + level;
+
+    if(percentage>=60){
+        document.getElementById("passFail").innerHTML="✅ PASS";
+        document.getElementById("passFail").style.color="green";
+    }else{
+        document.getElementById("passFail").innerHTML="❌ FAIL";
+        document.getElementById("passFail").style.color="red";
+    }
+
+    // Animate Circle
+    const circle = document.getElementById("progressCircle");
+    const radius = 65;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (percentage / 100) * circumference;
+    circle.style.strokeDashoffset = offset;
+
+    document.getElementById("percentageText").innerText = percentage + "%";
+
     await saveResult();
     loadLeaderboard();
 }
-
-loadLeaderboard();
-
 </script>
 </body>
 </html>
